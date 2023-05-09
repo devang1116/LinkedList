@@ -1,157 +1,193 @@
 //
 //  main.cpp
-//  list1
+//  LinkedList
 //
-//  Created by Devang Papinwar on 18/02/21.
+//  Created by Devang Papinwar on 09/05/23.
 //
 
 #include <iostream>
+#include <vector>
 using namespace std;
 
-struct Person
+class Node
 {
+public:
     int data;
-    Person* next;
+    Node* next;
+    Node(int val)
+    {
+        this->data = val;
+    }
 };
 
-void display( Person* head )
+class LinkedList
 {
-    cout << "\nDisplaying Information : " << endl ;
-    int counter = 0;
-    while(head != NULL)
+public:
+    Node* head;
+    LinkedList()
     {
-        counter++;
-        cout << "Data " << counter << " : " << head->data << " - > ";
-        head = head->next;
+        head = NULL;
     }
-    cout << endl;
-}
-
-void search(Person* p1)
-{
-    int data;
-    cout << "Enter the Data : ";
-    cin >> data;
-    Person* head = p1;
-    int counter = 1;
-    while(head->next != NULL)
+    
+    int getSize()
     {
-        if(head->data == data)
+        Node* temp = head;
+        int size = 0;
+        
+        while(temp->next != NULL)
         {
-            cout << " DATA : " << head->data << " Counter : " << counter << endl;
+            size++;
+            temp = temp->next;
         }
-        head = head->next;
-        counter++;
+        
+        return size;
     }
-}
-
-void insertAtBeg(Person** head)
-{
-    struct Person* new_node = (struct Person*) malloc(sizeof(struct Person));
-    cout << "Enter Data : ";
-    cin >> new_node->data;
-    new_node->next = *head;
-    *head = new_node;
-}
-
-void insertInMiddle(Person* head,int loc)
-{
-    struct Person* new_node = (struct Person*) malloc(sizeof(struct Person));
-    Person* temp = new Person();
-    Person* tem = head;
-    cout << "Enter Data : ";
-    cin >> new_node->data;
-    for(int i=0; i<=loc-1 ; i++)
+    void display()
     {
-        tem = head;
-        temp = tem->next;
-        head = head->next;
+        Node* temp = head;
+        
+        cout << endl << "Size : " << getSize() << endl;
+        while(temp != NULL)
+        {
+            cout << temp->data << " ";
+            temp = temp->next;
+        }
     }
-    new_node->next = temp;
-    tem->next = new_node;
-}
-
-void insertAtEnd(Person* head)
-{
-    struct Person* new_node = (struct Person*) malloc(sizeof(struct Person));
-    cout << "Enter Data : ";
-    cin >> new_node->data;
-    new_node->next = NULL;
-    Person* temp = head;
-    while(temp->next != NULL)
+    
+    void insertAtStart(int data)
     {
-        temp = temp->next;
+        Node* newNode = new Node(data);
+        
+        if(head == NULL)
+        {
+            head = newNode;
+            return;
+        }
+        
+        newNode->next = head;
+        head = newNode;
     }
-    temp->next = new_node;
-}
-
-void deleteInBeg(Person** head)
-{
-    struct Person* temp = (struct Person*) malloc(sizeof(struct Person));
-    temp = *head;
-    *head = temp->next;
-}
-
-void deleteFromMiddle(Person* head,int loc)
-{
-    struct Person* new_node = (struct Person*) malloc(sizeof(struct Person));
-    Person* temp = new Person();
-    Person* tem = new Person();
-    for(int i=0; i<=loc-1 ; i++)
+    
+    void insertAtLoc(int data , int loc)
     {
-        tem = head;
-        temp = tem->next;
-        head = head->next;
+        int size = getSize();
+        
+        if(loc < 0 || loc > size)
+            return;
+        
+        if(loc == size)
+            insertAtEnd(data);
+        
+        if(loc == 0)
+            insertAtStart(data);
+        
+        Node* newNode = new Node(data);
+        int length = 0;
+        Node* temp = head;
+        
+        while(temp->next != NULL && length != loc - 1)
+        {
+            temp = temp->next;
+            length++;
+        }
+        
+        Node* nextNext = temp->next;
+        
+        temp->next = newNode;
+        newNode->next = nextNext;
     }
-    new_node = temp->next;
-    tem->next = new_node;
-    temp->next = NULL;
-}
-
-void deleteFromBack(Person* head)
-{
-    while(head->next->next != NULL)
+    
+    void insertAtEnd(int data)
     {
-        head = head->next;
+        Node* newNode = new Node(data);
+        
+        if(head == NULL)
+        {
+            head = newNode;
+            return;
+        }
+        
+        Node* temp = head;
+        
+        while(temp->next != NULL)
+            temp = temp->next;
+        
+        temp->next = newNode;
     }
-    head->next = NULL;
-}
-
-Person* reverse(Person* head)
-{
-    if(head == NULL || head->next == NULL)
+    
+    void deleteAtStart()
     {
-        return head;
+        int size = getSize();
+        
+        if(size <= 1)
+            head = NULL;
+        else
+        {
+            head = head->next;
+        }
     }
-    Person* rest = reverse(head->next);
-    head->next->next = head;
-    head->next = NULL;
-    return rest;
-}
+    
+    void deleteAtEnd()
+    {
+        int size = getSize();
+        
+        if(size <= 1)
+            deleteAtStart();
+        
+        Node* temp = head;
+        
+        while(temp->next->next != NULL)
+        {
+            temp = temp->next;
+        }
+        
+        temp->next = NULL;
+    }
+    
+    void deleteAtLoc(int loc)
+    {
+        int size = getSize();
+        
+        if(size <= 1)
+        {
+            deleteAtStart();
+            return;
+        }
+        if(loc == size)
+        {
+            deleteAtEnd();
+            return;
+        }
+        
+        Node* temp = head;
+        int length = 0;
+        
+        while(temp->next->next != NULL && length != loc - 1)
+        {
+            length++;
+            temp = temp->next;
+        }
+        
+        temp->next = temp->next->next;
+    }
+};
+
+
 
 int main(int argc, const char * argv[])
 {
-    Person* p1 = new Person();
-    Person* p2 = new Person();
-    Person* p3 = new Person();
-    Person* head = new Person();
+    LinkedList list ;
     
-    p1->data = 10;
-    p2->data = 20;
-    p3->data = 30;
+    list.insertAtStart(4);
+    list.insertAtStart(2);
+    list.insertAtStart(1);
+    list.insertAtEnd(5);
+    list.insertAtLoc(3, 2);
+    list.display();
     
-    head = p1;
-    p1->next = p2;
-    p2->next = p3;
-    p3->next = NULL;
-    
-    insertAtBeg(&head);
-    insertAtEnd(head);
-    //insertInMid(head,1);
-    //deleteInBeg(&head);
-    //deleteFromBack(head);
-    //deleteFromMiddle(head, 1);
-    //head = reverse(head);
-    display(head);
-    //search(head);
+    list.deleteAtStart();
+    list.deleteAtEnd();
+    list.deleteAtLoc(1);
+    list.display();
+    return 0;
 }
